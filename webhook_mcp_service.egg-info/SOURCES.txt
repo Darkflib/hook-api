@@ -1,0 +1,11 @@
+README.md
+pyproject.toml
+app/main.py
+app/mcp_wrapper.py
+tests/test_mcp_wrapper.py
+webhook_mcp_service.egg-info/PKG-INFO
+webhook_mcp_service.egg-info/SOURCES.txt
+webhook_mcp_service.egg-info/dependency_links.txt
+webhook_mcp_service.egg-info/entry_points.txt
+webhook_mcp_service.egg-info/requires.txt
+webhook_mcp_service.egg-info/top_level.txt
