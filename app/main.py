@@ -14,6 +14,7 @@ from app.core import (
     WebhookTemplateCreate,
     AdhocWebhookTrigger,
     TemplatedWebhookTrigger,
+    format_recursive,
 )
 from app.mcp_wrapper import mcp_server # Import the MCP server
 
@@ -290,17 +291,7 @@ async def trigger_templated_webhook(trigger: TemplatedWebhookTrigger):
         
         headers = {k: v.format(**values) for k, v in template['headers_template'].items()}
         
-        # A simple recursive function to format strings in a nested dict/list structure
-        def format_recursive(item):
-            if isinstance(item, str):
-                return item.format(**values)
-            if isinstance(item, dict):
-                return {k: format_recursive(v) for k, v in item.items()}
-            if isinstance(item, list):
-                return [format_recursive(i) for i in item]
-            return item
-
-        body = format_recursive(template['body_template'])
+        body = format_recursive(template['body_template'], values)
         
         # Ensure body is a dictionary
         if not isinstance(body, dict):
