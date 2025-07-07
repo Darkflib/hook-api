@@ -69,7 +69,7 @@ async def send_webhook(method: str, url: str, headers: Dict[str, str], json_body
     async with httpx.AsyncClient() as client:
         try:
             if not wait_for_response:
-                asyncio.create_task(client.request(method, url, headers=headers, json=json_body, timeout=10.0))
+                asyncio.create_task(_handle_async_task(client.request(method, url, headers=headers, json=json_body, timeout=10.0)))
                 return {
                     "webhook_status": "accepted",
                     "message": "Webhook request has been sent asynchronously",
