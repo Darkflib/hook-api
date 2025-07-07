@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 # Import from app.core now
-from app.core import AdhocWebhookTrigger, TemplatedWebhookTrigger, send_webhook, db, HTTPException
+from app.core import AdhocWebhookTrigger, TemplatedWebhookTrigger, send_webhook, db, HTTPException, format_recursive
 
 mcp_server = FastMCP("WebhookMCP")
 
@@ -62,16 +62,7 @@ async def trigger_templated_webhook_mcp(
             for k, v in template['headers_template'].items()
         }
 
-        def format_recursive(item):
-            if isinstance(item, str):
-                return item.format(**trigger.values)
-            if isinstance(item, dict):
-                return {k: format_recursive(v) for k, v in item.items()}
-            if isinstance(item, list):
-                return [format_recursive(i) for i in item]
-            return item
-
-        body = format_recursive(template['body_template'])
+        body = format_recursive(template['body_template'], trigger.values)
         if not isinstance(body, dict):
             body = {"data": body} # Ensure body is a dict
 
