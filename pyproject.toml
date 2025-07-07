@@ -1,0 +1,25 @@
+[project]
+name = "webhook-mcp-service"
+version = "0.1.0"
+description = "An API for creating, managing, and triggering templated webhooks for testing."
+authors = [
+    {name = "darkflib", email = "darkflib@gmail.com"}
+]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+
+# Dependencies
+
+dependencies = [
+    "fastapi>=0.111.0",
+    "uvicorn>=0.29.0",
+    "httpx>=0.27.0",
+    "click>=8.1.7",
+    "rich>=13.7.1"
+]
+
+
+# Scripts
+[project.scripts]
+start = "app.run:start"
