@@ -1,3 +1,18 @@
+Metadata-Version: 2.4
+Name: webhook-mcp-service
+Version: 0.1.0
+Summary: An API for creating, managing, and triggering templated webhooks for testing.
+Author-email: darkflib <darkflib@gmail.com>
+License-Expression: MIT
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.111.0
+Requires-Dist: uvicorn>=0.29.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: click>=8.1.7
+Requires-Dist: rich>=13.7.1
+Requires-Dist: mcp>=1.10.1
+
 # Webhook MCP Service
 
 A FastAPI-based service for creating, managing, and triggering templated webhooks for testing and integration purposes.
@@ -141,80 +156,6 @@ curl -X 'POST' \
 This will send a POST request to `https://hooks.example.com/services/T123ABC` with the substituted username and email in the body.
 
 Set `wait_for_response` to `false` to send the webhook asynchronously without waiting for a response.
-
-## MCP (Model Context Protocol) Integration
-
-This service also exposes its webhook triggering capabilities via the Model Context Protocol (MCP) at the `/mcp` endpoint.
-This allows MCP-compatible clients (like certain AI models or development tools) to interact with the webhook service programmatically.
-
-### MCP Server Details
-
-- **MCP Endpoint**: `http://127.0.0.1:8000/mcp` (when running locally)
-- **Authentication**: None (for this local wrapper)
-
-### Available MCP Tools
-
-The following tools are exposed via the MCP server:
-
-1.  **`trigger_adhoc_webhook_mcp`**
-    *   Description: Triggers an ad-hoc (non-templated) webhook. Mirrors the functionality of the `/webhooks/trigger/adhoc` HTTP endpoint.
-    *   Input Schema:
-        *   `method` (string, required): HTTP method (e.g., "POST", "GET").
-        *   `url` (string, required): The complete target URL for the webhook.
-        *   `headers` (object, required): Dictionary of HTTP headers.
-        *   `body` (object, required): JSON body for the webhook.
-        *   `wait_for_response` (boolean, optional, default: `true`): Whether to wait for and return the target server's response.
-    *   Output: A dictionary containing the result of the webhook call, similar to the `/webhooks/trigger/adhoc` HTTP endpoint's response. Includes `webhook_status`, `webhook_request`, and `webhook_response` (if `wait_for_response` is true). Returns an `error` object if the call fails.
-
-2.  **`trigger_templated_webhook_mcp`**
-    *   Description: Triggers a webhook based on a pre-defined template. Mirrors the functionality of the `/webhooks/trigger/template` HTTP endpoint.
-    *   Input Schema:
-        *   `template_id` (string, required): The ID of the template to use.
-        *   `values` (object, required): Dictionary of values to substitute into the template's placeholders.
-        *   `wait_for_response` (boolean, optional, default: `true`): Whether to wait for and return the target server's response.
-    *   Output: A dictionary containing the result of the webhook call, similar to the `/webhooks/trigger/template` HTTP endpoint's response. Includes `webhook_status`, `webhook_request`, and `webhook_response` (if `wait_for_response` is true). Returns an `error` object if the template is not found, placeholder values are missing, or the call fails.
-
-### Example MCP Client Usage (Conceptual Python)
-
-```python
-# Conceptual example using the mcp-sdk
-from mcp import ClientSession
-from mcp.client.streamable_http import streamablehttp_client
-
-async def call_adhoc_webhook_via_mcp():
-    mcp_service_url = "http://127.0.0.1:8000/mcp" # Ensure the service is running
-    async with streamablehttp_client(mcp_service_url) as (read, write, _):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-
-            adhoc_params = {
-                "method": "POST",
-                "url": "https://httpbin.org/post",
-                "headers": {"X-Mcp-Test": "true"},
-                "body": {"message": "Hello from MCP tool!"},
-                "wait_for_response": True
-            }
-            result = await session.call_tool("trigger_adhoc_webhook_mcp", adhoc_params)
-            print(result)
-
-async def call_templated_webhook_via_mcp(template_id: str):
-    mcp_service_url = "http://127.0.0.1:8000/mcp" # Ensure the service is running
-    async with streamablehttp_client(mcp_service_url) as (read, write, _):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-
-            template_params = {
-                "template_id": template_id, # Assumes template_id exists
-                "values": {"user_id": "mcp-user-789", "custom_param": "test value"},
-                "wait_for_response": True
-            }
-            result = await session.call_tool("trigger_templated_webhook_mcp", template_params)
-            print(result)
-
-# To run these examples, you would need to have the mcp sdk installed
-# and potentially run them within an asyncio event loop.
-# The webhook service (FastAPI app) must be running at http://127.0.0.1:8000.
-```
 
 ## API Response Format
 
